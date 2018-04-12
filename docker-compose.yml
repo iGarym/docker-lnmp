@@ -1,0 +1,45 @@
+version: "3.3"
+
+services:
+  nginx:
+    image: "${DOCKER_USER}/nginx:${NGINX_VERSION}"
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+    depends_on:
+      - php
+
+  php:
+    image: "${DOCKER_USER}/php:${PHP_VERSION}"
+    networks:
+      - frontend
+      - backend
+    environment:
+      MYSQL_PASSWORD: my_MYSQL_paasword
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      TZ: 'Asia/Shanghai'
+      MYSQL_ROOT_PASSWORD: my_MYSQL_paasword
+    command: ['mysqld', '--character-set-server=utf8']
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend
+
+volumes:
+  mysql-data:
+
+networks:
+  frontend:
+  backend:
+
+# "dns" isn't top-level property
+# dns:
+#  - 1.1.1.1
+#  - 8.8.8.8
+#  - 119.29.29.29
